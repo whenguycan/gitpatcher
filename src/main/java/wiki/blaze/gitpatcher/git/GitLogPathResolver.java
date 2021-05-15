@@ -23,18 +23,18 @@ public class GitLogPathResolver implements PathResolver {
             int idx = path.lastIndexOf(".");
             String pre = path.substring(0, idx);
             return new PathPair(
-                    pathReplace(sourcePathSet, pre, "target/classes") + ".class",
-                    pathReplace(sourcePathSet, pre, "/WEB-INF/classes") + ".class"
+                    pathReplace(pre, sourcePathSet, "target/classes").concat(".class"),
+                    pathReplace(pre, sourcePathSet, "/WEB-INF/classes").concat(".class")
             );
         }else if(isResourcePath(path)) {
             return new PathPair(
-                    pathReplace(resourcePathSet, path, "target/classes"),
-                    pathReplace(resourcePathSet, path, "/WEB-INF/classes")
+                    pathReplace(path, resourcePathSet, "target/classes"),
+                    pathReplace(path, resourcePathSet, "/WEB-INF/classes")
             );
         }else if(isWebappPath(path)) {
             return new PathPair(
                     path,
-                    pathReplace(webappPathSet, path, "")
+                    pathReplace(path, webappPathSet, "")
             );
         }else {
             throw new RuntimeException("-->path not match in resolver: " + path);
@@ -42,35 +42,37 @@ public class GitLogPathResolver implements PathResolver {
     }
 
     Set<String> sourcePathSet = Arrays.stream(new String[]{
-            "src/main/business", "src/main/app", "src/main/core", "/src/main/resourcelibrary"
+            "src/main/java",
+            "src/main/business", "src/main/app",
+            "src/main/core", "/src/main/resourcelibrary"
     }).collect(Collectors.toSet());
     Set<String> resourcePathSet = Arrays.stream(new String[]{"src/main/resources"}).collect(Collectors.toSet());
     Set<String> webappPathSet = Arrays.stream(new String[]{"src/main/webapp"}).collect(Collectors.toSet());
 
     boolean isSourcePath(String path) {
-        return pathMatches(sourcePathSet, path);
+        return pathMatches(path, sourcePathSet);
     }
 
     boolean isResourcePath(String path) {
-        return pathMatches(resourcePathSet, path);
+        return pathMatches(path, resourcePathSet);
     }
 
     boolean isWebappPath(String path) {
-        return pathMatches(webappPathSet, path);
+        return pathMatches(path, webappPathSet);
     }
 
-    boolean pathMatches(Set<String> matcherPathSet, String path) {
+    boolean pathMatches(String path, Set<String> matcherPathSet) {
         for (String matcherPath : matcherPathSet) {
-            if(path.indexOf(matcherPath) == 0) {
+            if(path.startsWith(matcherPath)) {
                 return true;
             }
         }
         return false;
     }
 
-    String pathReplace(Set<String> pathSet, String path, String replaceBy) {
+    String pathReplace(String path, Set<String> pathSet, String replaceBy) {
         for (String p : pathSet) {
-            if(path.indexOf(p) == 0) {
+            if(path.startsWith(p)) {
                 return path.replace(p, replaceBy);
             }
         }

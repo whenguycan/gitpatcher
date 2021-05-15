@@ -24,12 +24,12 @@ public class GitLogPathResolver implements PathResolver {
             String pre = path.substring(0, idx);
             return new PathPair(
                     pathReplace(sourcePathSet, pre, "target/classes") + ".class",
-                    pathReplace(sourcePathSet, pre, "WEB-INF/classes") + ".class"
+                    pathReplace(sourcePathSet, pre, "/WEB-INF/classes") + ".class"
             );
         }else if(isResourcePath(path)) {
             return new PathPair(
                     pathReplace(resourcePathSet, path, "target/classes"),
-                    pathReplace(resourcePathSet, path, "WEB-INF/classes")
+                    pathReplace(resourcePathSet, path, "/WEB-INF/classes")
             );
         }else if(isWebappPath(path)) {
             return new PathPair(

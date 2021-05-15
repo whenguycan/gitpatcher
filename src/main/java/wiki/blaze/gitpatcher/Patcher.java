@@ -58,7 +58,9 @@ public class Patcher {
                 .filter(path -> pathResolver.access(path))
                 .map(path -> pathResolver.translate(path))
                 .collect(Collectors.toSet());
+        System.out.println(String.format("[%s] files to copy", pathPairSet.size()));
         pathPairSet.forEach(pair -> fileCopy(pair));
+        System.out.println("make patch complete");
     }
 
     private void fileCopy(PathPair pair) {
@@ -68,6 +70,7 @@ public class Patcher {
             targetFile.getParentFile().mkdirs();
         }
         try (OutputStream os = new FileOutputStream(targetFile)) {
+            System.out.println("file copy to --> " + targetFile.getPath());
             Files.copy(sourceFile.toPath(), os);
         } catch (Exception e) {
             e.printStackTrace();

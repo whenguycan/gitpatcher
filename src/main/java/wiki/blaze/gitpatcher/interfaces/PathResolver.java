@@ -1,5 +1,9 @@
 package wiki.blaze.gitpatcher.interfaces;
 
+import wiki.blaze.gitpatcher.PathPair;
+
+import java.util.Map;
+
 /**
  * 路径解析器
  * @Author wangcy
@@ -9,7 +13,7 @@ public interface PathResolver {
 
     boolean access(String path);
 
-    String translate(String path);
+    PathPair translate(String path);
 
 }
 

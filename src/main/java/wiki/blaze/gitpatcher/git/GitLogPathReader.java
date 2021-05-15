@@ -1,4 +1,4 @@
-package wiki.blaze.gitpatcher;
+package wiki.blaze.gitpatcher.git;
 
 import wiki.blaze.gitpatcher.interfaces.PathReader;
 
@@ -16,9 +16,9 @@ public class GitLogPathReader implements PathReader {
     String hash;
     File dir;
 
-    public GitLogPathReader(String hash, String projectDir) {
+    public GitLogPathReader(String hash, File commandDir) {
         this.hash = hash;
-        this.dir = new File(projectDir);
+        this.dir = commandDir;
     }
 
     public Set<String> read() {

@@ -1,5 +1,6 @@
-package wiki.blaze.gitpatcher;
+package wiki.blaze.gitpatcher.git;
 
+import wiki.blaze.gitpatcher.PathPair;
 import wiki.blaze.gitpatcher.interfaces.PathResolver;
 
 import java.util.Arrays;
@@ -17,16 +18,24 @@ public class GitLogPathResolver implements PathResolver {
         return isSourcePath(path) || isResourcePath(path) || isWebappPath(path);
     }
 
-    public String translate(String path) {
+    public PathPair translate(String path) {
         if(isSourcePath(path)) {
-
-            return path;
+            int idx = path.lastIndexOf(".");
+            String pre = path.substring(0, idx);
+            return new PathPair(
+                    pathReplace(sourcePathSet, pre, "target/classes") + ".class",
+                    pathReplace(sourcePathSet, pre, "WEB-INF/classes") + ".class"
+            );
         }else if(isResourcePath(path)) {
-
-            return path;
+            return new PathPair(
+                    pathReplace(resourcePathSet, path, "target/classes"),
+                    pathReplace(resourcePathSet, path, "WEB-INF/classes")
+            );
         }else if(isWebappPath(path)) {
-
-            return path;
+            return new PathPair(
+                    path,
+                    pathReplace(webappPathSet, path, "")
+            );
         }else {
             throw new RuntimeException("-->path not match in resolver: " + path);
         }
@@ -57,5 +66,14 @@ public class GitLogPathResolver implements PathResolver {
             }
         }
         return false;
+    }
+
+    String pathReplace(Set<String> pathSet, String path, String replaceBy) {
+        for (String p : pathSet) {
+            if(path.indexOf(p) == 0) {
+                return path.replace(p, replaceBy);
+            }
+        }
+        throw new RuntimeException("set not contains path: " + path);
     }
 }

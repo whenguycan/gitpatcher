@@ -1,12 +1,15 @@
 package wiki.blaze.gitpatcher;
 
+import wiki.blaze.gitpatcher.interfaces.NameFilter;
 import wiki.blaze.gitpatcher.interfaces.PathReader;
 import wiki.blaze.gitpatcher.interfaces.PathResolver;
+import wiki.blaze.gitpatcher.util.PathPair;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -19,6 +22,7 @@ public class Patcher {
 
     PathReader pathReader;
     PathResolver pathResolver;
+    NameFilter nameFilter;
     File sourceDir;
     File targetDir;
 
@@ -26,41 +30,68 @@ public class Patcher {
         return new Patcher();
     }
 
-    public Patcher setPathReader(PathReader pathReader) {
+    public Patcher pathReader(PathReader pathReader) {
         this.pathReader = pathReader;
         return this;
     }
 
-    public Patcher setPathResolver(PathResolver pathResolver) {
+    public Patcher pathResolver(PathResolver pathResolver) {
         this.pathResolver = pathResolver;
         return this;
     }
 
-    public Patcher setSourceDir(File sourceDir) {
+    public Patcher nameFilter(NameFilter nameFilter) {
+        this.nameFilter = nameFilter;
+        return this;
+    }
+
+    public Patcher sourceDir(File sourceDir) {
         this.sourceDir = sourceDir;
         return this;
     }
 
-    public Patcher setTargetDir(File targetDir) {
+    public Patcher targetDir(File targetDir) {
         this.targetDir = targetDir;
         return this;
     }
 
     public void patches() {
+        System.out.println("--> start to make patch");
         if(pathReader == null) {
-            throw new RuntimeException("pathReader is null");
+            throw new RuntimeException("pathReader will not be null");
         }
         if(pathResolver == null) {
-            throw new RuntimeException("pathResolver is null");
+            throw new RuntimeException("pathResolver will not be null");
         }
+        Set<String> willExcludes = new HashSet<>();
         Set<PathPair> pathPairSet = pathReader.read()
                 .stream()
                 .filter(path -> pathResolver.access(path))
                 .map(path -> pathResolver.translate(path))
+                .filter(pair -> {
+                    String targetPath = pair.target;
+                    if(nameFilter == null) {
+                        return true;
+                    }else {
+                        Set<String> excludes = nameFilter.excludes();
+                        for (String exclude : excludes) {
+                            if(targetPath.contains(exclude)) {
+                                willExcludes.add(targetPath);
+                                return false;
+                            }
+                        }
+                        return true;
+                    }
+                })
                 .collect(Collectors.toSet());
         System.out.println(String.format("[%s] files to copy", pathPairSet.size()));
-        pathPairSet.forEach(pair -> fileCopy(pair));
-        System.out.println("make patch complete");
+        pathPairSet.forEach(pair -> {
+            fileCopy(pair);
+            System.out.println("file copy --> " + pair.target);
+        });
+        System.out.println(String.format("[%s] files will be excluded", willExcludes.size()));
+        willExcludes.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
+        System.out.println("--> make patch complete");
     }
 
     private void fileCopy(PathPair pair) {
@@ -70,7 +101,6 @@ public class Patcher {
             targetFile.getParentFile().mkdirs();
         }
         try (OutputStream os = new FileOutputStream(targetFile)) {
-            System.out.println("file copy to --> " + targetFile.getPath());
             Files.copy(sourceFile.toPath(), os);
         } catch (Exception e) {
             e.printStackTrace();

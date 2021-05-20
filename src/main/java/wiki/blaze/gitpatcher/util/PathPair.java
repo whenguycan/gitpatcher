@@ -1,4 +1,4 @@
-package wiki.blaze.gitpatcher;
+package wiki.blaze.gitpatcher.util;
 
 /**
  * @Author wangcy

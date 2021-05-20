@@ -1,8 +1,6 @@
 package wiki.blaze.gitpatcher.interfaces;
 
-import wiki.blaze.gitpatcher.PathPair;
-
-import java.util.Map;
+import wiki.blaze.gitpatcher.util.PathPair;
 
 /**
  * 路径解析器

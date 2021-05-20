@@ -1,6 +1,6 @@
 package wiki.blaze.gitpatcher.git;
 
-import wiki.blaze.gitpatcher.PathPair;
+import wiki.blaze.gitpatcher.util.PathPair;
 import wiki.blaze.gitpatcher.interfaces.PathResolver;
 
 import java.util.Arrays;
@@ -74,6 +74,6 @@ public class GitLogPathResolver implements PathResolver {
                 return path.replace(p, replaceBy);
             }
         }
-        throw new RuntimeException("set not contains path: " + path);
+        throw new RuntimeException("not contains any item in pathSet for path: " + path);
     }
 }

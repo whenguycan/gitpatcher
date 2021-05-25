@@ -42,7 +42,7 @@ public class GitLogPathResolver implements PathResolver {
     }
 
     Set<String> sourcePathSet = Arrays.stream(new String[]{
-            "src/main/business", "src/main/app", "src/main/core", "/src/main/resourcelibrary"
+            "src/main/business", "src/main/app", "src/main/core", "src/main/resourcelibrary"
     }).collect(Collectors.toSet());
     Set<String> resourcePathSet = Arrays.stream(new String[]{"src/main/resources"}).collect(Collectors.toSet());
     Set<String> webappPathSet = Arrays.stream(new String[]{"src/main/webapp"}).collect(Collectors.toSet());

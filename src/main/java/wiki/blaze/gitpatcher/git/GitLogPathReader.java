@@ -1,6 +1,7 @@
 package wiki.blaze.gitpatcher.git;
 
 import wiki.blaze.gitpatcher.interfaces.PathReader;
+import wiki.blaze.gitpatcher.util.PathHolder;
 
 import java.io.*;
 import java.util.HashSet;
@@ -13,17 +14,28 @@ import java.util.Set;
  */
 public class GitLogPathReader implements PathReader {
 
-    String hash;
+    String[] hashes;
     File dir;
 
-    public GitLogPathReader(String hash, File commandDir) {
-        this.hash = hash;
+    public GitLogPathReader(File commandDir, String... hashes) {
         this.dir = commandDir;
+        this.hashes = hashes;
     }
 
-    public Set<String> read() {
+    public Set<PathHolder> read() {
+        Set<PathHolder> set = new HashSet<>();
+        if(hashes == null || hashes.length == 0) {
+            throw new RuntimeException("hashes must not be empty");
+        }
+        for (String hash : hashes) {
+            set.addAll(read0(hash));
+        }
+        return set;
+    }
+
+    private Set<PathHolder> read0(String hash) {
         try {
-            Set<String> set = new HashSet<>();
+            Set<PathHolder> set = new HashSet<>();
             Runtime runtime = Runtime.getRuntime();
             String command = String.format("git show %s --name-only", hash);
             Process process = runtime.exec(command, null, dir);
@@ -31,8 +43,10 @@ public class GitLogPathReader implements PathReader {
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line = null;
             while((line = reader.readLine()) != null) {
-                set.add(line);
+                set.add(new PathHolder(line, dir));
             }
+            reader.close();
+            is.close();
             return set;
         } catch (Exception e) {
             e.printStackTrace();

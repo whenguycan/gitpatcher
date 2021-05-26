@@ -3,7 +3,7 @@ package wiki.blaze.gitpatcher;
 import wiki.blaze.gitpatcher.interfaces.NameFilter;
 import wiki.blaze.gitpatcher.interfaces.PathReader;
 import wiki.blaze.gitpatcher.interfaces.PathResolver;
-import wiki.blaze.gitpatcher.util.PathPair;
+import wiki.blaze.gitpatcher.util.PathHolder;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,7 +14,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
- * 简易补丁生成器（读取git日志打包）
+ * 简易补丁生成器（读取git日志打包）主程序
  * @Author wangcy
  * @Date 2021/5/14 13:49
  */
@@ -23,19 +23,22 @@ public class Patcher {
     PathReader pathReader;
     PathResolver pathResolver;
     NameFilter nameFilter;
-    File sourceDir;
-    File targetDir;
+    File patchDir;
+
+    private Patcher() {
+
+    }
 
     public static Patcher newInstance() {
         return new Patcher();
     }
 
-    public Patcher pathReader(PathReader pathReader) {
+    public Patcher setPathReader(PathReader pathReader) {
         this.pathReader = pathReader;
         return this;
     }
 
-    public Patcher pathResolver(PathResolver pathResolver) {
+    public Patcher setPathResolver(PathResolver pathResolver) {
         this.pathResolver = pathResolver;
         return this;
     }
@@ -45,58 +48,55 @@ public class Patcher {
         return this;
     }
 
-    public Patcher sourceDir(File sourceDir) {
-        this.sourceDir = sourceDir;
-        return this;
-    }
-
-    public Patcher targetDir(File targetDir) {
-        this.targetDir = targetDir;
+    public Patcher patchDir(File patchDir) {
+        this.patchDir = patchDir;
         return this;
     }
 
     public void patches() {
-        System.out.println("--> start to make patch");
+        System.out.println("--> make patch start");
         if(pathReader == null) {
-            throw new RuntimeException("pathReader will not be null");
+            throw new RuntimeException("pathReaderList will not be empty");
         }
         if(pathResolver == null) {
             throw new RuntimeException("pathResolver will not be null");
         }
         Set<String> willExcludes = new HashSet<>();
-        Set<PathPair> pathPairSet = pathReader.read()
-                .stream()
-                .filter(path -> pathResolver.access(path))
-                .map(path -> pathResolver.translate(path))
-                .filter(pair -> {
-                    String targetPath = pair.target;
-                    if(nameFilter == null) {
-                        return true;
-                    }else {
-                        Set<String> excludes = nameFilter.excludes();
-                        for (String exclude : excludes) {
-                            if(targetPath.contains(exclude)) {
-                                willExcludes.add(targetPath);
-                                return false;
+        Set<PathHolder> pathHolderSet = new HashSet<>();
+        pathHolderSet.addAll(
+                pathReader.read()
+                        .stream()
+                        .filter(path -> pathResolver.access(path))
+                        .map(path -> pathResolver.translate(path))
+                        .filter(pair -> {
+                            String targetPath = pair.target;
+                            if(nameFilter == null) {
+                                return true;
+                            }else {
+                                Set<String> excludes = nameFilter.excludes();
+                                for (String exclude : excludes) {
+                                    if(targetPath.contains(exclude)) {
+                                        willExcludes.add(targetPath);
+                                        return false;
+                                    }
+                                }
+                                return true;
                             }
-                        }
-                        return true;
-                    }
-                })
-                .collect(Collectors.toSet());
-        System.out.println(String.format("[%s] files to copy", pathPairSet.size()));
-        pathPairSet.forEach(pair -> {
-            fileCopy(pair);
-            System.out.println("file copy --> " + pair.target);
+                        })
+                        .collect(Collectors.toSet()));
+        System.out.println(String.format("[%s] files to copy", pathHolderSet.size()));
+        pathHolderSet.forEach(holder -> {
+            fileCopy(holder);
+            System.out.println("file copy --> " + holder.target);
         });
         System.out.println(String.format("[%s] files will be excluded", willExcludes.size()));
         willExcludes.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
         System.out.println("--> make patch complete");
     }
 
-    private void fileCopy(PathPair pair) {
-        File sourceFile = new File(sourceDir, pair.source);
-        File targetFile = new File(targetDir, pair.target);
+    private void fileCopy(PathHolder pathHolder) {
+        File sourceFile = new File(pathHolder.sourceDir, pathHolder.source);
+        File targetFile = new File(patchDir, pathHolder.target);
         if(!targetFile.getParentFile().exists()) {
             targetFile.getParentFile().mkdirs();
         }

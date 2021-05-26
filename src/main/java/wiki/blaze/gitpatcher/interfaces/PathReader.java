@@ -1,5 +1,7 @@
 package wiki.blaze.gitpatcher.interfaces;
 
+import wiki.blaze.gitpatcher.util.PathHolder;
+
 import java.util.Set;
 
 /**
@@ -9,6 +11,6 @@ import java.util.Set;
  */
 public interface PathReader {
 
-    Set<String> read();
+    Set<PathHolder> read();
 
 }

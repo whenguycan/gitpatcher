@@ -1,6 +1,6 @@
 package wiki.blaze.gitpatcher.interfaces;
 
-import wiki.blaze.gitpatcher.util.PathPair;
+import wiki.blaze.gitpatcher.util.PathHolder;
 
 /**
  * 路径解析器
@@ -9,9 +9,9 @@ import wiki.blaze.gitpatcher.util.PathPair;
  */
 public interface PathResolver {
 
-    boolean access(String path);
+    boolean access(PathHolder pathHolder);
 
-    PathPair translate(String path);
+    PathHolder translate(PathHolder pathHolder);
 
 }
 

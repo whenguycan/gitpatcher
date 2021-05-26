@@ -1,6 +1,6 @@
 package wiki.blaze.gitpatcher.git;
 
-import wiki.blaze.gitpatcher.util.PathPair;
+import wiki.blaze.gitpatcher.util.PathHolder;
 import wiki.blaze.gitpatcher.interfaces.PathResolver;
 
 import java.util.Arrays;
@@ -14,25 +14,27 @@ import java.util.stream.Collectors;
  */
 public class GitLogPathResolver implements PathResolver {
 
-    public boolean access(String path) {
+    public boolean access(PathHolder pathHolder) {
+        String path = pathHolder.path;
         return isSourcePath(path) || isResourcePath(path) || isWebappPath(path);
     }
 
-    public PathPair translate(String path) {
+    public PathHolder translate(PathHolder pathHolder) {
+        String path = pathHolder.path;
         if(isSourcePath(path)) {
             int idx = path.lastIndexOf(".");
             String pre = path.substring(0, idx);
-            return new PathPair(
+            return pathHolder.init(
                     pathReplace(sourcePathSet, pre, "target/classes") + ".class",
                     pathReplace(sourcePathSet, pre, "/WEB-INF/classes") + ".class"
             );
         }else if(isResourcePath(path)) {
-            return new PathPair(
+            return pathHolder.init(
                     pathReplace(resourcePathSet, path, "target/classes"),
                     pathReplace(resourcePathSet, path, "/WEB-INF/classes")
             );
         }else if(isWebappPath(path)) {
-            return new PathPair(
+            return pathHolder.init(
                     path,
                     pathReplace(webappPathSet, path, "")
             );

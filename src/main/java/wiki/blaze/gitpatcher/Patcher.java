@@ -23,6 +23,7 @@ public class Patcher {
     PathReader pathReader;
     PathResolver pathResolver;
     NameFilter nameFilter;
+    File sourceDir;
     File patchDir;
 
     private Patcher() {
@@ -48,31 +49,46 @@ public class Patcher {
         return this;
     }
 
-    public Patcher patchDir(File patchDir) {
+    public Patcher setPatchDir(File patchDir) {
         this.patchDir = patchDir;
         return this;
     }
 
-    public void patches() {
-        System.out.println("--> make patch start");
+    public Patcher setSourceDir(File sourceDir) {
+        this.sourceDir = sourceDir;
+        return this;
+    }
+
+    private void check() {
         if(pathReader == null) {
-            throw new RuntimeException("pathReaderList will not be empty");
+            throw new RuntimeException("pathReader must not be null");
         }
         if(pathResolver == null) {
-            throw new RuntimeException("pathResolver will not be null");
+            throw new RuntimeException("pathResolver must not be null");
         }
+        if(patchDir == null) {
+            throw new RuntimeException("patchDir must not be null");
+        }
+        if(sourceDir == null) {
+            throw new RuntimeException("sourceDir must not be null");
+        }
+    }
+
+    public void patches() {
+        System.out.println("--> make patch start");
+        check();
         Set<String> willExcludes = new HashSet<>();
         Set<PathHolder> pathHolderSet = new HashSet<>();
         pathHolderSet.addAll(
-                pathReader.read()
+                pathReader.read(sourceDir)
                         .stream()
                         .filter(path -> pathResolver.access(path))
                         .map(path -> pathResolver.translate(path))
                         .filter(pair -> {
-                            String targetPath = pair.target;
                             if(nameFilter == null) {
                                 return true;
                             }else {
+                                String targetPath = pair.target;
                                 Set<String> excludes = nameFilter.excludes();
                                 for (String exclude : excludes) {
                                     if(targetPath.contains(exclude)) {
@@ -84,13 +100,13 @@ public class Patcher {
                             }
                         })
                         .collect(Collectors.toSet()));
-        System.out.println(String.format("[%s] files to copy", pathHolderSet.size()));
         pathHolderSet.forEach(holder -> {
             fileCopy(holder);
             System.out.println("file copy --> " + holder.target);
         });
-        System.out.println(String.format("[%s] files will be excluded", willExcludes.size()));
+        System.out.println(String.format("[%s] files copied", pathHolderSet.size()));
         willExcludes.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
+        System.out.println(String.format("[%s] files excluded", willExcludes.size()));
         System.out.println("--> make patch complete");
     }
 

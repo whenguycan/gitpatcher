@@ -15,35 +15,33 @@ import java.util.Set;
 public class GitLogPathReader implements PathReader {
 
     String[] hashes;
-    File dir;
 
-    public GitLogPathReader(File commandDir, String... hashes) {
-        this.dir = commandDir;
+    public GitLogPathReader(String... hashes) {
         this.hashes = hashes;
     }
 
-    public Set<PathHolder> read() {
+    public Set<PathHolder> read(File commandDir) {
         Set<PathHolder> set = new HashSet<>();
         if(hashes == null || hashes.length == 0) {
             throw new RuntimeException("hashes must not be empty");
         }
         for (String hash : hashes) {
-            set.addAll(read0(hash));
+            set.addAll(read0(commandDir, hash));
         }
         return set;
     }
 
-    private Set<PathHolder> read0(String hash) {
+    private Set<PathHolder> read0(File commandDir, String hash) {
         try {
             Set<PathHolder> set = new HashSet<>();
             Runtime runtime = Runtime.getRuntime();
             String command = String.format("git show %s --name-only", hash);
-            Process process = runtime.exec(command, null, dir);
+            Process process = runtime.exec(command, null, commandDir);
             InputStream is = process.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));
             String line = null;
             while((line = reader.readLine()) != null) {
-                set.add(new PathHolder(line, dir));
+                set.add(new PathHolder(line, commandDir));
             }
             reader.close();
             is.close();

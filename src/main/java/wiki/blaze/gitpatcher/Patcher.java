@@ -9,7 +9,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -78,33 +80,33 @@ public class Patcher {
         System.out.println("--> make patch start");
         check();
         Set<String> willExcludes = new HashSet<>();
-        Set<PathHolder> pathHolderSet = new HashSet<>();
-        pathHolderSet.addAll(
-                pathReader.read(sourceDir)
-                        .stream()
-                        .filter(path -> pathResolver.access(path))
-                        .map(path -> pathResolver.translate(path))
-                        .filter(pair -> {
-                            if(nameFilter == null) {
-                                return true;
-                            }else {
-                                String targetPath = pair.target;
-                                Set<String> excludes = nameFilter.excludes();
-                                for (String exclude : excludes) {
-                                    if(targetPath.contains(exclude)) {
-                                        willExcludes.add(targetPath);
-                                        return false;
-                                    }
-                                }
-                                return true;
+        Map<String, PathHolder> map = new HashMap<>();
+        pathReader.read(sourceDir)
+                .stream()
+                .filter(path -> pathResolver.access(path))
+                .map(path -> pathResolver.translate(path))
+                .filter(pair -> {
+                    if(nameFilter == null) {
+                        return true;
+                    }else {
+                        String targetPath = pair.target;
+                        Set<String> excludes = nameFilter.excludes();
+                        for (String exclude : excludes) {
+                            if(targetPath.contains(exclude)) {
+                                willExcludes.add(targetPath);
+                                return false;
                             }
-                        })
-                        .collect(Collectors.toSet()));
-        pathHolderSet.forEach(holder -> {
+                        }
+                        return true;
+                    }
+                })
+                .forEach(pathHolder -> map.put(pathHolder.path, pathHolder));
+        map.entrySet().forEach(entry -> {
+            PathHolder holder = entry.getValue();
             fileCopy(holder);
             System.out.println("file copy --> " + holder.target);
         });
-        System.out.println(String.format("[%s] files copied", pathHolderSet.size()));
+        System.out.println(String.format("[%s] files copied", map.size()));
         willExcludes.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
         System.out.println(String.format("[%s] files excluded", willExcludes.size()));
         System.out.println("--> make patch complete");

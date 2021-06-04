@@ -2,7 +2,7 @@ package wiki.blaze.gitpatcher;
 
 import wiki.blaze.gitpatcher.filters.DefaultNameFilter;
 import wiki.blaze.gitpatcher.git.GitLogPathReader;
-import wiki.blaze.gitpatcher.git.GitLogPathResolver;
+import wiki.blaze.gitpatcher.git.GitLogTomcatPathResolver;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -25,7 +25,7 @@ public class Startup {
                 .setSourceDir(sourceDir)
                 .setPatchDir(patchDir)
                 .setPathReader(new GitLogPathReader(args))
-                .setPathResolver(new GitLogPathResolver())
+                .setPathResolver(new GitLogTomcatPathResolver())
                 .nameFilter(new DefaultNameFilter())
                 .patches();
     }

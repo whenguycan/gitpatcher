@@ -13,10 +13,11 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * 简易补丁生成器（读取git日志打包）主程序
+ *      目前只应用于编译好的class文件
+ *      后期考虑读取java源码编译并生成补丁
  * @Author wangcy
  * @Date 2021/5/14 13:49
  */
@@ -101,14 +102,13 @@ public class Patcher {
                     }
                 })
                 .forEach(pathHolder -> map.put(pathHolder.path, pathHolder));
-        map.entrySet().forEach(entry -> {
-            PathHolder holder = entry.getValue();
+        map.forEach((path, holder) -> {
             fileCopy(holder);
             System.out.println("file copy --> " + holder.target);
         });
-        System.out.println(String.format("[%s] files copied", map.size()));
+        System.out.printf("[%s] files copied\n", map.size());
         willExcludes.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
-        System.out.println(String.format("[%s] files excluded", willExcludes.size()));
+        System.out.printf("[%s] files excluded\n", willExcludes.size());
         System.out.println("--> make patch complete");
     }
 
@@ -116,7 +116,10 @@ public class Patcher {
         File sourceFile = new File(pathHolder.sourceDir, pathHolder.source);
         File targetFile = new File(patchDir, pathHolder.target);
         if(!targetFile.getParentFile().exists()) {
-            targetFile.getParentFile().mkdirs();
+            boolean success = targetFile.getParentFile().mkdirs();
+            if(!success) {
+                throw new RuntimeException("mkdirs failed: " + targetFile.getParentFile().getPath());
+            }
         }
         try (OutputStream os = new FileOutputStream(targetFile)) {
             Files.copy(sourceFile.toPath(), os);

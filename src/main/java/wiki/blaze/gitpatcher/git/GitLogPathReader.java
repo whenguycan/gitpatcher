@@ -2,6 +2,7 @@ package wiki.blaze.gitpatcher.git;
 
 import wiki.blaze.gitpatcher.interfaces.PathReader;
 import wiki.blaze.gitpatcher.util.PathHolder;
+import wiki.blaze.gitpatcher.util.StringUtils;
 
 import java.io.*;
 import java.util.HashSet;
@@ -26,7 +27,9 @@ public class GitLogPathReader implements PathReader {
             throw new RuntimeException("hashes must not be empty");
         }
         for (String hash : hashes) {
-            set.addAll(read0(commandDir, hash));
+            if(StringUtils.isNotEmpty(hash)) {
+                set.addAll(read0(commandDir, hash));
+            }
         }
         return set;
     }

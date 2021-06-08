@@ -131,16 +131,12 @@ public class Patcher {
             Arrays.stream(new File(holder.source).getParentFile().listFiles())
                     .forEach(file -> {
                         String filepath = file.getPath();
-                        if(filepath.contains(filepathWithoutExt + "$")) {
+                        if(filepath.contains(CLASS_PATTERN) && filepath.contains(filepathWithoutExt + "$")) {
                             resultMap.put(filepath, new PathHolder().init(filepath, new File(targetDir, file.getName()).getPath()));
                         }
                     });
         });
         map.putAll(resultMap);
-    }
-
-    private boolean isClassFile(String path) {
-        return path != null && path.contains(CLASS_PATTERN);
     }
 
     private void fileCopy(PathHolder holder) {

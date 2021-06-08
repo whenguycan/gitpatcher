@@ -9,10 +9,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStream;
 import java.nio.file.Files;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * 简易补丁生成器（读取git日志打包）主程序
@@ -101,7 +98,12 @@ public class Patcher {
                         return true;
                     }
                 })
-                .forEach(pathHolder -> map.put(pathHolder.path, pathHolder));
+                .forEach(holder -> map.put(holder.path, holder));
+        // link filepath to absolute path
+        linkPath(map);
+        // find inner .class file and fill into map
+        fillWithInnerClass(map);
+        // copy file
         map.forEach((path, holder) -> {
             fileCopy(holder);
             System.out.println("file copy --> " + holder.target);
@@ -112,9 +114,38 @@ public class Patcher {
         System.out.println("--> make patch complete");
     }
 
-    private void fileCopy(PathHolder pathHolder) {
-        File sourceFile = new File(pathHolder.sourceDir, pathHolder.source);
-        File targetFile = new File(patchDir, pathHolder.target);
+    private void linkPath(Map<String, PathHolder> map) {
+        map.forEach((path, holder) -> {
+            holder.source = new File(holder.sourceDir, holder.source).getPath();
+            holder.target = new File(patchDir, holder.target).getPath();
+        });
+    }
+
+    final String CLASS_PATTERN = ".class";
+
+    private void fillWithInnerClass(Map<String, PathHolder> map) {
+        Map<String, PathHolder> resultMap = new HashMap<>();
+        map.forEach((path, holder) -> {
+            String filepathWithoutExt = holder.source.replace(CLASS_PATTERN, "");
+            File targetDir = new File(holder.target).getParentFile();
+            Arrays.stream(new File(holder.source).getParentFile().listFiles())
+                    .forEach(file -> {
+                        String filepath = file.getPath();
+                        if(filepath.contains(filepathWithoutExt + "$")) {
+                            resultMap.put(filepath, new PathHolder().init(filepath, new File(targetDir, file.getName()).getPath()));
+                        }
+                    });
+        });
+        map.putAll(resultMap);
+    }
+
+    private boolean isClassFile(String path) {
+        return path != null && path.contains(CLASS_PATTERN);
+    }
+
+    private void fileCopy(PathHolder holder) {
+        File sourceFile = new File(holder.source);
+        File targetFile = new File(holder.target);
         if(!targetFile.getParentFile().exists()) {
             boolean success = targetFile.getParentFile().mkdirs();
             if(!success) {

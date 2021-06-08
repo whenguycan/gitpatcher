@@ -62,29 +62,29 @@ public class GitLogTomcatPathResolver implements PathResolver {
         }
     }
 
-    public boolean access(PathHolder pathHolder) {
+    public boolean access(PathHolder holder) {
         pathCheck();
-        String path = pathHolder.path;
+        String path = holder.path;
         return isSourcePath(path) || isResourcePath(path) || isWebappPath(path);
     }
 
-    public PathHolder translate(PathHolder pathHolder) {
+    public PathHolder translate(PathHolder holder) {
         pathCheck();
-        String path = pathHolder.path;
+        String path = holder.path;
         if(isSourcePath(path)) {
             int idx = path.lastIndexOf(".");
             String pre = path.substring(0, idx);
-            return pathHolder.init(
+            return holder.init(
                     pathReplace(sourcePathSet, pre, sourceClassesRelativePath) + ".class",
                     pathReplace(sourcePathSet, pre, targetClassesRelativePath) + ".class"
             );
         }else if(isResourcePath(path)) {
-            return pathHolder.init(
+            return holder.init(
                     pathReplace(resourcePathSet, path, sourceClassesRelativePath),
                     pathReplace(resourcePathSet, path, targetClassesRelativePath)
             );
         }else if(isWebappPath(path)) {
-            return pathHolder.init(
+            return holder.init(
                     path,
                     pathReplace(webappPathSet, path, "")
             );

@@ -13,6 +13,10 @@ public class PathHolder {
     public String source;
     public String target;
 
+    public PathHolder() {
+
+    }
+
     public PathHolder(String path, File sourceDir) {
         this.path = path;
         this.sourceDir = sourceDir;

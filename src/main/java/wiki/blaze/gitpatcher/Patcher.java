@@ -111,6 +111,7 @@ public class Patcher {
         System.out.printf("[%s] files copied\n", map.size());
         willExcludes.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
         System.out.printf("[%s] files excluded\n", willExcludes.size());
+        System.out.println("--> patchDir: " + patchDir.getPath());
         System.out.println("--> make patch complete");
     }
 

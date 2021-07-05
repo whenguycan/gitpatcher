@@ -16,7 +16,8 @@ public class DefaultNameFilter implements NameFilter {
         return Arrays.stream(new String[]{
                 "Spring-dao.xml",
                 "Spring-mvc.xml",
-                "Spring-Shiro.xml"
+                "Spring-Shiro.xml",
+                "config.properties"
         }).collect(Collectors.toSet());
     }
 }

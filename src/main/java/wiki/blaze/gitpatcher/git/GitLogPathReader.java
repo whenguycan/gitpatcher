@@ -55,4 +55,13 @@ public class GitLogPathReader implements PathReader {
         }
     }
 
+    public String version() {
+        if(hashes == null || hashes.length == 0) {
+            return "_no_version";
+        }else if(hashes.length == 1) {
+            return String.format("_%s", hashes[0]);
+        }
+        return String.format("_%s_%s", hashes[0], hashes[hashes.length - 1]);
+    }
+
 }

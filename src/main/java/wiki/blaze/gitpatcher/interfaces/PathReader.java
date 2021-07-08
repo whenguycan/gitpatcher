@@ -14,4 +14,6 @@ public interface PathReader {
 
     Set<PathHolder> read(File commandDir);
 
+    String version();
+
 }

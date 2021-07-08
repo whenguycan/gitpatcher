@@ -14,9 +14,10 @@ import java.util.*;
 /**
  * 简易补丁生成器（读取git日志打包）主程序
  *      目前只应用于编译好的class文件
- *      后期考虑读取java源码编译并生成补丁
+ *      下版本读取java源码编译并生成补丁
  * @Author wangcy
  * @Date 2021/5/14 13:49
+ * @version 0.1
  */
 public class Patcher {
 
@@ -28,6 +29,15 @@ public class Patcher {
 
     private Patcher() {
 
+    }
+
+    private File getPatchDir() {
+        String path = patchDir.getPath() + pathReader.version();
+        return new File(path);
+    }
+
+    private File getSourceDir() {
+        return sourceDir;
     }
 
     public static Patcher newInstance() {
@@ -79,7 +89,7 @@ public class Patcher {
         check();
         Set<String> willExcludes = new HashSet<>();
         Map<String, PathHolder> map = new HashMap<>();
-        pathReader.read(sourceDir)
+        pathReader.read(getSourceDir())
                 .stream()
                 .filter(path -> pathResolver.access(path))
                 .map(path -> pathResolver.translate(path))
@@ -111,14 +121,14 @@ public class Patcher {
         System.out.printf("[%s] files copied\n", map.size());
         willExcludes.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
         System.out.printf("[%s] files excluded\n", willExcludes.size());
-        System.out.println("--> patchDir: " + patchDir.getPath());
+        System.out.println("--> patchDir: " + getPatchDir().getPath());
         System.out.println("--> make patch complete");
     }
 
     private void linkPath(Map<String, PathHolder> map) {
         map.forEach((path, holder) -> {
             holder.source = new File(holder.sourceDir, holder.source).getPath();
-            holder.target = new File(patchDir, holder.target).getPath();
+            holder.target = new File(getPatchDir(), holder.target).getPath();
         });
     }
 

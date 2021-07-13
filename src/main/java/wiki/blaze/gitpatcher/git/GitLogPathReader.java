@@ -5,7 +5,9 @@ import wiki.blaze.gitpatcher.util.PathHolder;
 import wiki.blaze.gitpatcher.util.StringUtils;
 
 import java.io.*;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -58,10 +60,22 @@ public class GitLogPathReader implements PathReader {
     public String version() {
         if(hashes == null || hashes.length == 0) {
             return "_no_version";
-        }else if(hashes.length == 1) {
-            return String.format("_%s", hashes[0]);
+        }else {
+            List<String> list = new ArrayList<>();
+            for (String hash : hashes) {
+                if(StringUtils.isNotEmpty(hash)) {
+                    list.add(hash);
+                }
+            }
+            int size = list.size();
+            if(size == 0) {
+                return "_no_version";
+            }else if(size == 1) {
+                return String.format("_%s", list.get(0));
+            }else {
+                return String.format("_%s_%s", list.get(0), list.get(size - 1));
+            }
         }
-        return String.format("_%s_%s", hashes[0], hashes[hashes.length - 1]);
     }
 
 }

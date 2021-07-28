@@ -5,8 +5,10 @@ import wiki.blaze.gitpatcher.interfaces.PathReader;
 import wiki.blaze.gitpatcher.interfaces.PathResolver;
 import wiki.blaze.gitpatcher.util.PathHolder;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.nio.file.Files;
 import java.util.*;
@@ -85,6 +87,10 @@ public class Patcher {
     }
 
     public void patches() {
+        patches(false);
+    }
+
+    public void patches(boolean openInExplorer) {
         System.out.println("--> make patch start");
         check();
         Set<String> willExcludes = new HashSet<>();
@@ -126,6 +132,13 @@ public class Patcher {
         System.out.printf("[%s] files excluded\n", willExcludes.size());
         System.out.println("--> patchDir: " + getPatchDir().getPath());
         System.out.println("--> make patch complete");
+        if(openInExplorer) {
+            try {
+                Desktop.getDesktop().open(getPatchDir());
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     private void linkPath(Map<String, PathHolder> map) {

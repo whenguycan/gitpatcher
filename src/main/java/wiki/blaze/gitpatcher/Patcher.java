@@ -88,6 +88,7 @@ public class Patcher {
         System.out.println("--> make patch start");
         check();
         Set<String> willExcludes = new HashSet<>();
+        Set<String> copyFailed = new HashSet<>();
         Map<String, PathHolder> map = new HashMap<>();
         pathReader.read(getSourceDir())
                 .stream()
@@ -115,10 +116,12 @@ public class Patcher {
         fillWithInnerClass(map);
         // copy file
         map.forEach((path, holder) -> {
-            fileCopy(holder);
+            fileCopy(holder, copyFailed);
             System.out.println("file copy --> " + holder.target);
         });
         System.out.printf("[%s] files copied\n", map.size());
+        copyFailed.forEach(path -> System.out.println("file copy failed --> " + path));
+        System.out.printf("[%s] files copy failed\n", copyFailed.size());
         willExcludes.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
         System.out.printf("[%s] files excluded\n", willExcludes.size());
         System.out.println("--> patchDir: " + getPatchDir().getPath());
@@ -150,7 +153,7 @@ public class Patcher {
         map.putAll(resultMap);
     }
 
-    private void fileCopy(PathHolder holder) {
+    private void fileCopy(PathHolder holder, Set<String> copyFailed) {
         File sourceFile = new File(holder.source);
         File targetFile = new File(holder.target);
         if(!targetFile.getParentFile().exists()) {
@@ -163,6 +166,7 @@ public class Patcher {
             Files.copy(sourceFile.toPath(), os);
         } catch (Exception e) {
             e.printStackTrace();
+            copyFailed.add(holder.source);
         }
     }
 

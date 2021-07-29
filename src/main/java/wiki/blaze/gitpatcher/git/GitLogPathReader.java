@@ -69,11 +69,11 @@ public class GitLogPathReader implements PathReader {
             }
             int size = list.size();
             if(size == 0) {
-                return "_no_version";
+                return "_no_version_";
             }else if(size == 1) {
-                return String.format("_%s", list.get(0));
+                return String.format("_%s_", list.get(0));
             }else {
-                return String.format("_%s_%s", list.get(0), list.get(size - 1));
+                return String.format("_%s_%s_", list.get(0), list.get(size - 1));
             }
         }
     }

@@ -121,10 +121,10 @@ public class Patcher {
         // find inner .class file and fill into map
         fillWithInnerClass(map);
         // copy file
-        map.forEach((path, holder) -> {
-            fileCopy(holder, copyFailed);
-            System.out.println("file copy --> " + holder.target);
-        });
+        for(Map.Entry<String, PathHolder> entry : map.entrySet()) {
+            fileCopy(entry.getValue(), copyFailed);
+            System.out.println("file copy --> " + entry.getValue().target);
+        }
         System.out.printf("[%s] files copied\n", map.size());
         copyFailed.forEach(path -> System.out.println("file copy failed --> " + path));
         System.out.printf("[%s] files copy failed\n", copyFailed.size());
@@ -154,20 +154,27 @@ public class Patcher {
         Map<String, PathHolder> resultMap = new HashMap<>();
         map.forEach((path, holder) -> {
             String filepathWithoutExt = holder.source.replace(CLASS_PATTERN, "");
-            File targetDir = new File(holder.target).getParentFile();
-            Arrays.stream(new File(holder.source).getParentFile().listFiles())
+            File targetFile = new File(holder.target);
+            if(targetFile.exists()) {
+                File targetDir = new File(holder.target).getParentFile();
+                Arrays.stream(new File(holder.source).getParentFile().listFiles())
                     .forEach(file -> {
                         String filepath = file.getPath();
                         if(filepath.contains(CLASS_PATTERN) && filepath.contains(filepathWithoutExt + "$")) {
                             resultMap.put(filepath, new PathHolder().init(filepath, new File(targetDir, file.getName()).getPath()));
                         }
                     });
+            }
         });
         map.putAll(resultMap);
     }
 
     private void fileCopy(PathHolder holder, Set<String> copyFailed) {
         File sourceFile = new File(holder.source);
+        if(!sourceFile.exists()) {
+            copyFailed.add(holder.source);
+            return;
+        }
         File targetFile = new File(holder.target);
         if(!targetFile.getParentFile().exists()) {
             boolean success = targetFile.getParentFile().mkdirs();

@@ -59,7 +59,7 @@ public class GitLogPathReader implements PathReader {
 
     public String version() {
         if(hashes == null || hashes.length == 0) {
-            return "_no_version";
+            return "_no_version_";
         }else {
             List<String> list = new ArrayList<>();
             for (String hash : hashes) {

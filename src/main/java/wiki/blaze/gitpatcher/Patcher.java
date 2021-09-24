@@ -101,19 +101,17 @@ public class Patcher {
                 .filter(path -> pathResolver.access(path))
                 .map(path -> pathResolver.translate(path))
                 .filter(pair -> {
-                    if(nameFilter == null) {
-                        return true;
-                    }else {
+                    if (nameFilter != null) {
                         String targetPath = pair.target;
                         Set<String> excludes = nameFilter.excludes();
                         for (String exclude : excludes) {
-                            if(targetPath.contains(exclude)) {
+                            if (targetPath.contains(exclude)) {
                                 willExcludes.add(targetPath);
                                 return false;
                             }
                         }
-                        return true;
                     }
+                    return true;
                 })
                 .forEach(holder -> map.put(holder.path, holder));
         // link filepath to absolute path

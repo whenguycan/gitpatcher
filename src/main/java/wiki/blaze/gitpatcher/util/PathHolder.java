@@ -28,4 +28,17 @@ public class PathHolder {
         return this;
     }
 
+    public boolean equals(Object o) {
+        if(this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        return this.hashCode() == o.hashCode();
+    }
+
+    public int hashCode() {
+        return this.path.hashCode();
+    }
 }

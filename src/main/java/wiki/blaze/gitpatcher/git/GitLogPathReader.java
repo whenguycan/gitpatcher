@@ -17,32 +17,32 @@ import java.util.Set;
  * @author wangcy
  * @date 2021/9/24 9:51
  */
-public abstract class GitLogPathReader implements PathReader {
+public class GitLogPathReader implements PathReader {
 
+    File commandDir;
     String[] hashes;
 
-    public GitLogPathReader(String... hashes) {
+    /**TODO 这么设计，需要传2次sourceDir，不是很好，考虑怎么能只传一次
+        可以考虑不用构造方法传参，使用init方法
+     */
+    public GitLogPathReader(File commandDir, String... hashes) {
+        this.commandDir = commandDir;
         this.hashes = hashes;
+        check();
     }
 
-    protected Set<PathHolder> execCommand(File commandDir, String command) {
-        try {
-            Set<PathHolder> set = new HashSet<>();
-            Runtime runtime = Runtime.getRuntime();
-            Process process = runtime.exec(command, null, commandDir);
-            InputStream is = process.getInputStream();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
-            String line = null;
-            while((line = reader.readLine()) != null) {
-                set.add(new PathHolder(line, commandDir));
+    public Set<PathHolder> read() {
+        Set<PathHolder> set = new HashSet<>();
+        for (String hash : hashes) {
+            if(StringUtils.isNotEmpty(hash)) {
+                String command = String.format("git show %s --name-only", hash);
+                List<String> list = execCommand(command);
+                for(String line : list) {
+                    set.add(new PathHolder(line, commandDir));
+                }
             }
-            reader.close();
-            is.close();
-            return set;
-        } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e);
         }
+        return set;
     }
 
     public String version() {
@@ -63,6 +63,35 @@ public abstract class GitLogPathReader implements PathReader {
             }else {
                 return String.format("_%s_%s_", list.get(0), list.get(size - 1));
             }
+        }
+    }
+
+    protected List<String> execCommand(String command) {
+        try {
+            Runtime runtime = Runtime.getRuntime();
+            Process process = runtime.exec(command, null, commandDir);
+            InputStream is = process.getInputStream();
+            BufferedReader reader = new BufferedReader(new InputStreamReader(is));
+            List<String> list = new ArrayList<>();
+            String line = null;
+            while((line = reader.readLine()) != null) {
+                list.add(line);
+            }
+            reader.close();
+            is.close();
+            return list;
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
+
+    protected void check() {
+        if(commandDir == null || !commandDir.exists()) {
+            throw new RuntimeException("commandDir not exists");
+        }
+        if(hashes == null || hashes.length == 0) {
+            throw new RuntimeException("hashes must not be empty");
         }
     }
 

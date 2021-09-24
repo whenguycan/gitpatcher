@@ -1,8 +1,8 @@
 package wiki.blaze.gitpatcher;
 
 import wiki.blaze.gitpatcher.filters.DefaultNameFilter;
-import wiki.blaze.gitpatcher.git.GitLogDiffPathReader;
-import wiki.blaze.gitpatcher.git.GitLogShowPathReader;
+import wiki.blaze.gitpatcher.git.GitLogHistoryPathReader;
+import wiki.blaze.gitpatcher.git.GitLogPathReader;
 import wiki.blaze.gitpatcher.git.GitLogTomcatPathResolver;
 import wiki.blaze.gitpatcher.interfaces.PathReader;
 
@@ -32,14 +32,14 @@ public class Startup {
             hashes[i] = args[i + 1];
         }
         switch(mode) {
-            case "show":
-                reader = new GitLogShowPathReader(hashes);
+            case "simple":
+                reader = new GitLogPathReader(sourceDir, hashes);
                 break;
-            case "diff":
-                reader = new GitLogDiffPathReader(args[1], args[2]);
+            case "history":
+                reader = new GitLogHistoryPathReader(sourceDir, Integer.parseInt(args[1]));
                 break;
             default:
-                throw new RuntimeException("模式错误[0]");
+                throw new RuntimeException("参数[0]错误，不存在的模式");
         }
         Patcher.newInstance()
                 .setSourceDir(sourceDir)

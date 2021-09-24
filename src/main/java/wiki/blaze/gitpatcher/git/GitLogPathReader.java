@@ -4,18 +4,20 @@ import wiki.blaze.gitpatcher.interfaces.PathReader;
 import wiki.blaze.gitpatcher.util.PathHolder;
 import wiki.blaze.gitpatcher.util.StringUtils;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 /**
- * git日志文件读取器
- * @Author wangcy
- * @Date 2021/5/14 16:47
+ * @author wangcy
+ * @date 2021/9/24 9:51
  */
-public class GitLogPathReader implements PathReader {
+public abstract class GitLogPathReader implements PathReader {
 
     String[] hashes;
 
@@ -23,24 +25,10 @@ public class GitLogPathReader implements PathReader {
         this.hashes = hashes;
     }
 
-    public Set<PathHolder> read(File commandDir) {
-        Set<PathHolder> set = new HashSet<>();
-        if(hashes == null || hashes.length == 0) {
-            throw new RuntimeException("hashes must not be empty");
-        }
-        for (String hash : hashes) {
-            if(StringUtils.isNotEmpty(hash)) {
-                set.addAll(read0(commandDir, hash));
-            }
-        }
-        return set;
-    }
-
-    private Set<PathHolder> read0(File commandDir, String hash) {
+    protected Set<PathHolder> execCommand(File commandDir, String command) {
         try {
             Set<PathHolder> set = new HashSet<>();
             Runtime runtime = Runtime.getRuntime();
-            String command = String.format("git show %s --name-only", hash);
             Process process = runtime.exec(command, null, commandDir);
             InputStream is = process.getInputStream();
             BufferedReader reader = new BufferedReader(new InputStreamReader(is));

@@ -96,7 +96,7 @@ public class Patcher {
         Set<String> willExcludes = new HashSet<>();
         Set<String> copyFailed = new HashSet<>();
         Map<String, PathHolder> map = new HashMap<>();
-        pathReader.read()
+        pathReader.read(sourceDir)
                 .stream()
                 .filter(path -> pathResolver.access(path))
                 .map(path -> pathResolver.translate(path))

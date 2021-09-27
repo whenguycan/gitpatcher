@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public interface PathReader {
 
-    Set<PathHolder> read();
+    Set<PathHolder> read(File commandDir);
 
     String version();
 

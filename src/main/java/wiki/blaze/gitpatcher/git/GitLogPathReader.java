@@ -19,24 +19,18 @@ import java.util.Set;
  */
 public class GitLogPathReader implements PathReader {
 
-    File commandDir;
     String[] hashes;
 
-    /**TODO 这么设计，需要传2次sourceDir，不是很好，考虑怎么能只传一次
-        可以考虑不用构造方法传参，使用init方法
-     */
-    public GitLogPathReader(File commandDir, String... hashes) {
-        this.commandDir = commandDir;
+    public GitLogPathReader(String... hashes) {
         this.hashes = hashes;
-        check();
     }
 
-    public Set<PathHolder> read() {
+    public Set<PathHolder> read(File commandDir) {
         Set<PathHolder> set = new HashSet<>();
         for (String hash : hashes) {
             if(StringUtils.isNotEmpty(hash)) {
                 String command = String.format("git show %s --name-only", hash);
-                List<String> list = execCommand(command);
+                List<String> list = execCommand(commandDir, command);
                 for(String line : list) {
                     set.add(new PathHolder(line, commandDir));
                 }
@@ -66,7 +60,7 @@ public class GitLogPathReader implements PathReader {
         }
     }
 
-    protected List<String> execCommand(String command) {
+    protected List<String> execCommand(File commandDir, String command) {
         try {
             Runtime runtime = Runtime.getRuntime();
             Process process = runtime.exec(command, null, commandDir);
@@ -83,15 +77,6 @@ public class GitLogPathReader implements PathReader {
         } catch (Exception e) {
             e.printStackTrace();
             throw new RuntimeException(e);
-        }
-    }
-
-    protected void check() {
-        if(commandDir == null || !commandDir.exists()) {
-            throw new RuntimeException("commandDir not exists");
-        }
-        if(hashes == null || hashes.length == 0) {
-            throw new RuntimeException("hashes must not be empty");
         }
     }
 

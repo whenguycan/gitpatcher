@@ -33,10 +33,10 @@ public class Startup {
         }
         switch(mode) {
             case "simple":
-                reader = new GitLogPathReader(sourceDir, hashes);
+                reader = new GitLogPathReader(hashes);
                 break;
             case "history":
-                reader = new GitLogHistoryPathReader(sourceDir, Integer.parseInt(args[1]));
+                reader = new GitLogHistoryPathReader(Integer.parseInt(hashes[0]));
                 break;
             default:
                 throw new RuntimeException("参数[0]错误，不存在的模式");

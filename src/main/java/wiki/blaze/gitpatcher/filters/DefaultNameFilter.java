@@ -17,7 +17,8 @@ public class DefaultNameFilter implements NameFilter {
                 "Spring-dao.xml",
                 "Spring-mvc.xml",
                 "Spring-Shiro.xml",
-                "config.properties"
+                "config.properties",
+                "artemis.properties"
         }).collect(Collectors.toSet());
     }
 }

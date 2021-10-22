@@ -186,6 +186,20 @@ public class Patcher {
             e.printStackTrace();
             copyFailed.add(holder.source);
         }
+        File sourceParentFile = sourceFile.getParentFile();
+        File targetParentFile = targetFile.getParentFile();
+        File[] files = sourceParentFile.listFiles();
+        if(files != null && files.length != 0) {
+            for(File file : files) {
+                if(file.getName().contains("$")) {
+                    try(OutputStream os = new FileOutputStream(new File(targetParentFile, file.getName()))) {
+                        Files.copy(file.toPath(), os);
+                    }catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
     }
 
 }

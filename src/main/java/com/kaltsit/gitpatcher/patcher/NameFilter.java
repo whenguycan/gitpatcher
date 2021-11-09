@@ -6,6 +6,6 @@ package com.kaltsit.gitpatcher.patcher;
  */
 public interface NameFilter {
 
-    boolean access(String path);
+    boolean matches(String path);
 
 }

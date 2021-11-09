@@ -3,6 +3,7 @@ package com.kaltsit.gitpatcher.patcher;
 import com.kaltsit.gitpatcher.util.PathPair;
 
 import java.io.File;
+import java.util.Set;
 
 /**
  * @author wangcy
@@ -12,6 +13,6 @@ public interface PathTranslator {
 
     boolean access(String path);
 
-    PathPair translate(PathPair pair, File sourceDir, File targetDir);
+    Set<PathPair> translate(String path, File sourceDir, File targetDir);
 
 }

@@ -11,7 +11,7 @@ import java.util.Set;
  * @author wangcy
  * @date 2021/9/24 11:20
  */
-public class GitLogHistoryPathReader extends GitLogPathReader {
+public class GitLogHistoryPathReader extends GitLogHashPathReader {
 
     int history;
 

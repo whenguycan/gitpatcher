@@ -56,20 +56,12 @@ public class GitLogTomcatPathResolver implements PathResolver {
         );
     }
 
-    private void pathCheck() {
-        if(StringUtils.isEmpty(sourceClassesRelativePath) || StringUtils.isEmpty(targetClassesRelativePath)) {
-            throw new RuntimeException("relative path not initialized");
-        }
-    }
-
     public boolean access(PathHolder holder) {
-        pathCheck();
         String path = holder.path;
         return isSourcePath(path) || isResourcePath(path) || isWebappPath(path);
     }
 
     public PathHolder translate(PathHolder holder) {
-        pathCheck();
         String path = holder.path;
         if(isSourcePath(path)) {
             int idx = path.lastIndexOf(".");

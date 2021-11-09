@@ -2,9 +2,8 @@ package wiki.blaze.gitpatcher.filters;
 
 import wiki.blaze.gitpatcher.interfaces.NameFilter;
 
-import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * @Author wangcy
@@ -13,12 +12,12 @@ import java.util.stream.Collectors;
 public class DefaultNameFilter implements NameFilter {
 
     public Set<String> excludes() {
-        return Arrays.stream(new String[]{
-                "Spring-dao.xml",
-                "Spring-mvc.xml",
-                "Spring-Shiro.xml",
-                "config.properties",
-                "artemis.properties"
-        }).collect(Collectors.toSet());
+        return new HashSet<String>(){{
+            add("Spring-dao.xml");
+            add("Spring-mvc.xml");
+            add("Spring-Shiro.xml");
+            add("config.properties");
+            add("artemis.properties");
+        }};
     }
 }

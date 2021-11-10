@@ -1,6 +1,5 @@
 package com.kaltsit.gitpatcher.patcher;
 
-import com.kaltsit.gitpatcher.patcher.NameFilter;
 import com.kaltsit.gitpatcher.util.StringUtils;
 
 import java.util.Arrays;

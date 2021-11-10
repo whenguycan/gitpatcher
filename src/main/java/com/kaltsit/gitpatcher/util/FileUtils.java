@@ -8,10 +8,6 @@ import java.io.File;
  */
 public class FileUtils {
 
-    public static String getFileName(String path) {
-        return StringUtils.isEmpty(path) ? null : getFileName(new File(path));
-    }
-
     public static String getFileName(File file) {
         if(file == null) {
             return null;

@@ -14,8 +14,8 @@ public class GitLogHashPathReader extends GitLogPathReader {
     List<String> hashes = new ArrayList<>();
 
     public GitLogHashPathReader(String... hashes) {
-        if(hashes == null) {
-            throw new RuntimeException("hashes is null");
+        if(hashes == null || hashes.length == 0) {
+            throw new RuntimeException("hashes is empty");
         }
         for(String hash : hashes) {
             if(StringUtils.isNotEmpty(hash)) {
@@ -40,12 +40,10 @@ public class GitLogHashPathReader extends GitLogPathReader {
 
     public String version() {
         if(hashes == null || hashes.isEmpty()) {
-            return "_no_version_";
+            throw new RuntimeException("hashes is empty");
         }else {
             int size = hashes.size();
-            if(size == 0) {
-                return "_no_version_";
-            }else if(size == 1) {
+            if(size == 1) {
                 return String.format("_%s_", hashes.get(0));
             }else {
                 return String.format("_%s_%s_", hashes.get(0), hashes.get(size - 1));

@@ -1,6 +1,5 @@
 package com.kaltsit.gitpatcher.patcher;
 
-import com.kaltsit.gitpatcher.patcher.MavenTomcatPathTranslator;
 import com.kaltsit.gitpatcher.util.PathPair;
 
 import java.io.File;

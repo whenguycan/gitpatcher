@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public interface PathTranslator {
 
-    boolean access(String path);
+    boolean accept(String path);
 
     Set<PathPair> translate(String path, File sourceDir, File targetDir);
 

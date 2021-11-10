@@ -23,7 +23,7 @@ public abstract class MavenTomcatPathTranslator implements PathTranslator {
         patternSet.addAll(Arrays.asList(patterns));
     }
 
-    public boolean access(String path) {
+    public boolean accept(String path) {
         for (String pattern : patternSet) {
             if(path != null && path.contains(pattern)) {
                 patternMatches = pattern;

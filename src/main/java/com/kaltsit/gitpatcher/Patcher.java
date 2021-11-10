@@ -48,12 +48,10 @@ public class Patcher {
         return this;
     }
 
-    public Patcher useDefaultTranslator(boolean use) {
-        if(use) {
-            this.translators.add(new MavenTomcatSourcePathTranslator());
-            this.translators.add(new MavenTomcatResourcePathTranslator());
-            this.translators.add(new MavenTomcatWebappPathTranslator());
-        }
+    public Patcher useDefaultTranslators() {
+        this.translators.add(new MavenTomcatSourcePathTranslator());
+        this.translators.add(new MavenTomcatResourcePathTranslator());
+        this.translators.add(new MavenTomcatWebappPathTranslator());
         return this;
     }
 
@@ -87,7 +85,7 @@ public class Patcher {
                 }else {
                     if(recognized(path)) {
                         for(PathTranslator translator : translators) {
-                            if(translator.access(path)) {
+                            if(translator.accept(path)) {
                                 pairToCopyList.addAll(translator.translate(path, sourceDir, targetDir));
                                 break;
                             }
@@ -107,7 +105,7 @@ public class Patcher {
         //copy failure
         copyFailed.forEach(path -> System.out.println("file copy failed --> " + path));
         System.out.printf("[%s] files copy failed\n", copyFailed.size());
-
+        //exclude
         pathExcludeList.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
         System.out.printf("[%s] files excluded\n", pathExcludeList.size());
         System.out.println("--> patchDir: " + targetDir.getPath());
@@ -151,7 +149,7 @@ public class Patcher {
 
     private boolean recognized(String path) {
         for(PathTranslator translator : translators) {
-            if(translator.access(path)) {
+            if(translator.accept(path)) {
                 return true;
             }
         }

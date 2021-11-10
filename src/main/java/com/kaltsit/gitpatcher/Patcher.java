@@ -19,7 +19,7 @@ import java.util.*;
 import java.util.List;
 
 /**
- * 打包器
+ * 打包器主程序
  * @author wangcy
  * @date 2021/11/9 13:44
  */

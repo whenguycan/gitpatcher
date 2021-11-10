@@ -3,9 +3,6 @@ package com.kaltsit.gitpatcher;
 import com.kaltsit.gitpatcher.patcher.NameFilter;
 import com.kaltsit.gitpatcher.patcher.PathReader;
 import com.kaltsit.gitpatcher.patcher.PathTranslator;
-import com.kaltsit.gitpatcher.patcher.MavenTomcatResourcePathTranslator;
-import com.kaltsit.gitpatcher.patcher.MavenTomcatSourcePathTranslator;
-import com.kaltsit.gitpatcher.patcher.MavenTomcatWebappPathTranslator;
 import com.kaltsit.gitpatcher.util.PathPair;
 import com.kaltsit.gitpatcher.util.StringUtils;
 
@@ -32,37 +29,12 @@ public class Patcher {
     List<PathTranslator> translators = new ArrayList<>();
     List<NameFilter> filters = new ArrayList<>();
 
-    private Patcher() {
+    Patcher() {
 
     }
 
-    public static Patcher getInstance(File sourceDir, File patchDir) {
-        Patcher patcher = new Patcher();
-        patcher.sourceDir = sourceDir;
-        patcher.patchDir = patchDir;
-        return patcher;
-    }
-
-    public Patcher setPathReader(PathReader reader) {
-        this.reader = reader;
-        return this;
-    }
-
-    public Patcher useDefaultTranslators() {
-        this.translators.add(new MavenTomcatSourcePathTranslator());
-        this.translators.add(new MavenTomcatResourcePathTranslator());
-        this.translators.add(new MavenTomcatWebappPathTranslator());
-        return this;
-    }
-
-    public Patcher addPathTranslator(PathTranslator translator) {
-        this.translators.add(translator);
-        return this;
-    }
-
-    public Patcher addNameFilter(NameFilter filter) {
-        this.filters.add(filter);
-        return this;
+    public static PatcherBuilder builder() {
+        return new PatcherBuilder();
     }
 
     public void patches() {
@@ -96,6 +68,7 @@ public class Patcher {
                 }
             }
         }
+        System.out.println("--> make patch start");
         //copy success
         pairToCopyList.forEach(pair -> {
             fileCopy(pair, copyFailed);
@@ -108,7 +81,7 @@ public class Patcher {
         //exclude
         pathExcludeList.forEach(targetPath -> System.out.println("file exclude --> " + targetPath));
         System.out.printf("[%s] files excluded\n", pathExcludeList.size());
-        System.out.println("--> patchDir: " + targetDir.getPath());
+        System.out.println("--> patchAt: " + targetDir.getPath());
         System.out.println("--> make patch complete");
         try {
             Desktop.getDesktop().open(targetDir);
@@ -156,7 +129,7 @@ public class Patcher {
         return false;
     }
 
-    private void check() {
+    void check() {
         if(sourceDir == null) {
             throw new RuntimeException("sourceDir is empty");
         }

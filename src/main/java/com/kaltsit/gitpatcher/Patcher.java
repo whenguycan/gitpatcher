@@ -8,10 +8,9 @@ import com.kaltsit.gitpatcher.util.StringUtils;
 
 import java.awt.*;
 import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.*;
 import java.util.List;
 
@@ -103,8 +102,8 @@ public class Patcher {
                 throw new RuntimeException("mkdirs failed: " + targetFile.getParentFile().getPath());
             }
         }
-        try (OutputStream os = new FileOutputStream(targetFile)) {
-            Files.copy(sourceFile.toPath(), os);
+        try {
+            Files.copy(sourceFile.toPath(), targetFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
         } catch (Exception e) {
             e.printStackTrace();
             copyFailed.add(pair.source);

@@ -13,15 +13,15 @@ public class GitLogHashPathReader extends GitLogPathReader {
 
     List<String> hashes = new ArrayList<>();
 
+    GitLogHashPathReader() {
+
+    }
+
     public GitLogHashPathReader(String... hashes) {
         if(hashes == null || hashes.length == 0) {
             throw new RuntimeException("hashes is empty");
         }
-        for(String hash : hashes) {
-            if(StringUtils.isNotEmpty(hash)) {
-                this.hashes.add(hash);
-            }
-        }
+        this.hashes.addAll(Arrays.asList(hashes));
     }
 
     public Set<String> read(File commandDir) {

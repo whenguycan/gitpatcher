@@ -13,7 +13,14 @@ import java.util.List;
  */
 public abstract class GitLogPathReader implements PathReader {
 
-    protected List<String> execCommand(File commandDir, String command) {
+    File commandDir;
+
+    public PathReader init(File commandDir) {
+        this.commandDir = commandDir;
+        return this;
+    }
+
+    protected List<String> execCommand(String command) {
         try {
             Runtime runtime = Runtime.getRuntime();
             Process process = runtime.exec(command, null, commandDir);

@@ -9,7 +9,9 @@ import java.util.Set;
  */
 public interface PathReader {
 
-    Set<String> read(File commandDir);
+    PathReader init(File commandDir);
+
+    Set<String> read();
 
     String version();
 

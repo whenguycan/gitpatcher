@@ -42,9 +42,8 @@ public class Patcher {
 
     public void patches(boolean openInExplorer) {
         check();
-        Set<String> pathSet = reader.read(sourceDir);
-        String version = reader.version();
-        File targetDir = new File(this.patchDir.getPath() + version);
+        Set<String> pathSet = reader.init(sourceDir).read();
+        File targetDir = new File(patchDir.getPath() + reader.version());
         List<PathPair> pairToCopyList = new ArrayList<>();
         Set<String> copyFailed = new LinkedHashSet<>();
         List<String> pathUnrecognizedList = new ArrayList<>();

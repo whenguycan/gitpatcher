@@ -2,7 +2,6 @@ package com.kaltsit.gitpatcher.patcher;
 
 import com.kaltsit.gitpatcher.util.StringUtils;
 
-import java.io.File;
 import java.util.*;
 
 /**
@@ -21,15 +20,19 @@ public class GitLogHashPathReader extends GitLogPathReader {
         if(hashes == null || hashes.length == 0) {
             throw new RuntimeException("hashes is empty");
         }
-        this.hashes.addAll(Arrays.asList(hashes));
+        for(String hash : hashes) {
+            if(StringUtils.isNotEmpty(hash)) {
+                this.hashes.add(hash);
+            }
+        }
     }
 
-    public Set<String> read(File commandDir) {
+    public Set<String> read() {
         Set<String> set = new LinkedHashSet<>();
         for (String hash : hashes) {
             if(StringUtils.isNotEmpty(hash)) {
                 String command = String.format("git show %s --name-only", hash);
-                List<String> list = execCommand(commandDir, command);
+                List<String> list = execCommand(command);
                 if(list != null) {
                     set.addAll(list);
                 }

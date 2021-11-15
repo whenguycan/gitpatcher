@@ -1,6 +1,5 @@
 package com.kaltsit.gitpatcher.patcher;
 
-import java.io.File;
 import java.util.List;
 import java.util.Set;
 
@@ -19,16 +18,16 @@ public class GitLogHistoryPathReader extends GitLogHashPathReader {
         }
     }
 
-    public Set<String> read(File commandDir) {
+    public Set<String> read() {
         String command = String.format("git log --oneline -%s", history);
-        List<String> list = execCommand(commandDir, command);
+        List<String> list = execCommand(command);
         for(String line : list) {
             if(line != null && line.length() > 6) {
                 String hash = line.substring(0, 7);
                 super.hashes.add(hash);
             }
         }
-        return super.read(commandDir);
+        return super.read();
     }
 
 }

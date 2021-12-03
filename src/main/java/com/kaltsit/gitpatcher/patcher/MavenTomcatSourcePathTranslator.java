@@ -23,7 +23,8 @@ public class MavenTomcatSourcePathTranslator extends MavenTomcatPathTranslator {
         File targetFile = new File(targetDir, super.targetClasspath + relativePath);
         Set<PathPair> set = new HashSet<>();
         set.add(new PathPair(sourceFile.getPath(), targetFile.getPath()));
-        File sDir = sourceDir.getParentFile();
+        //copy inner class
+        File sDir = sourceFile.getParentFile();
         if(sDir.exists()) {
             File[] files = sDir.listFiles();
             if(files != null) {
